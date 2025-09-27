@@ -1,5 +1,6 @@
 package manager;
 
+import factory.*;
 import model.*;
 import util.PaymentProcessor;
 import util.LanguageManager;
@@ -26,6 +27,31 @@ public class BookingManager
         this.customerManager = customerManager;
         this.roomManager = roomManager;
         this.hotelManager = hotelManager;
+    }
+
+    private ReservationFactory getTypeReservation(int type)
+    {
+        switch (type)
+        {
+            case 1:
+                return new StandardReservationFactory();
+
+            case 2:
+                return new PromoReservationFactory();
+
+            case 3:
+                return new CorporativeReservationFactory();
+
+            default:
+                return new StandardReservationFactory();
+        }
+    }
+
+
+    private Reservation createReservationFactory(int type,Customer customer,Hotel hotel,Room room, int days)
+    {
+        ReservationFactory factory = getTypeReservation(type);
+        return factory.createReservation(customer, hotel, room, days);
     }
 
     public void bookRoom()
@@ -56,33 +82,11 @@ public class BookingManager
         }
 
         Hotel hotel = hotelManager.getHotelByName(room.getHotelName());
-        Reservation reservation;
 
         System.out.println(LanguageManager.getMessage("booking.type"));
-        String typeChoiceString = scanner.nextLine();
+        int typeChoice = Integer.parseInt(scanner.nextLine());
 
-        int typeChoice = Integer.parseInt(typeChoiceString);
-
-        switch (typeChoice)
-        {
-                case 1:
-                    reservation = new StandardReservation(customer, hotel, room, days);
-                    break;
-
-                case 2:
-                    reservation = new PromoReservation(customer, hotel, room, days);
-                    break;
-
-                case 3:
-                    reservation = new CorporativeReservation(customer, hotel, room, days);
-                    break;
-
-                default:
-                    reservation = new StandardReservation(customer, hotel, room, days);
-                    break;
-        }
-
-
+        Reservation reservation = createReservationFactory(typeChoice, customer, hotel, room, days);
 
         amount = reservation.getTotalCost();
         boolean paid = PaymentProcessor.processPayment(customer.getName(), amount);
