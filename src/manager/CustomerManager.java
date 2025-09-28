@@ -20,23 +20,23 @@ public class CustomerManager
 
     public void createCustomer()
     {
-        System.out.println(LanguageManager.getMessage("customer.name"));
+        System.out.println(LanguageManager.INSTANCE.getMessage("customer.name"));
         String name = scanner.nextLine();
-        System.out.println(LanguageManager.getMessage("customer.email"));
+        System.out.println(LanguageManager.INSTANCE.getMessage("customer.email"));
         String email = scanner.nextLine();
 
         for (Customer c : customers)
         {
             if (c.getEmail().equalsIgnoreCase(email))
             {
-                System.out.println(LanguageManager.getMessage("customer.exists"));
+                System.out.println(LanguageManager.INSTANCE.getMessage("customer.exists"));
                 return;
             }
         }
 
         Customer newCustomer = new Customer(name, email);
         customers.add(newCustomer);
-        System.out.println(LanguageManager.getMessage("customer.created"));
+        System.out.println(LanguageManager.INSTANCE.getMessage("customer.created"));
     }
 
     public Customer getCustomerByEmail(String email)
@@ -72,17 +72,17 @@ public class CustomerManager
 
     public void showLoyaltyPoints()
     {
-        System.out.println(LanguageManager.getMessage("customer.loyalty_points.show"));
+        System.out.println(LanguageManager.INSTANCE.getMessage("customer.loyalty_points.show"));
         String email = scanner.nextLine();
 
         Customer customer = getCustomerByEmail(email);
         if (customer != null)
         {
-            System.out.println(MessageFormat.format(LanguageManager.getMessage("customer.loyalty_points.result"), email, customer.getLoyaltyPoints()));
+            System.out.println(MessageFormat.format(LanguageManager.INSTANCE.getMessage("customer.loyalty_points.result"), email, customer.getLoyaltyPoints()));
         }
         else
         {
-            System.out.println(LanguageManager.getMessage("customer.not_found"));
+            System.out.println(LanguageManager.INSTANCE.getMessage("customer.not_found"));
         }
     }
 }

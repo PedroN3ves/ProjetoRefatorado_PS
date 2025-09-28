@@ -23,18 +23,18 @@ public class HotelManager
 
     public void addHotel()
     {
-        System.out.println(LanguageManager.getMessage("hotel.hotel_name"));
+        System.out.println(LanguageManager.INSTANCE.getMessage("hotel.hotel_name"));
         String name = scanner.nextLine();
-        System.out.println(LanguageManager.getMessage("hotel.address"));
+        System.out.println(LanguageManager.INSTANCE.getMessage("hotel.address"));
         String address = scanner.nextLine();
-        System.out.println(LanguageManager.getMessage("hotel.description"));
+        System.out.println(LanguageManager.INSTANCE.getMessage("hotel.description"));
         String description = scanner.nextLine();
 
         for (Hotel h : hotels)
         {
             if (h.getName().equalsIgnoreCase(name))
             {
-                System.out.println(LanguageManager.getMessage("hotel.already_exists"));
+                System.out.println(LanguageManager.INSTANCE.getMessage("hotel.already_exists"));
                 return;
             }
         }
@@ -48,7 +48,7 @@ public class HotelManager
     {
         if (hotels.isEmpty())
         {
-            System.out.println(LanguageManager.getMessage("hotel.empty"));
+            System.out.println(LanguageManager.INSTANCE.getMessage("hotel.empty"));
         }
         else
         {

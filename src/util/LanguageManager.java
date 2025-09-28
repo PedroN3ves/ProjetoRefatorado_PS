@@ -4,13 +4,21 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Scanner;
 
-public class LanguageManager
+public enum LanguageManager
 {
-    private static ResourceBundle messages;
-    private static Locale currentLocale;
+    INSTANCE;
 
-    public static void initLanguage()
+    private ResourceBundle messages;
+    private Locale currentLocale;
+    private boolean initialized = false;
+
+    public void initLanguage()
     {
+        if(initialized)
+        {
+            return;
+        }
+
         Scanner scanner = new Scanner(System.in);
         System.out.println("Choose your language / Escolha seu idioma / Elija su idioma:");
         System.out.println("1. English\n2. Português\n3. Español");
@@ -38,10 +46,34 @@ public class LanguageManager
         messages = ResourceBundle.getBundle("messages", locale);
         currentLocale = locale;
         Values.init(locale);
+        initialized = true;
     }
 
-    public static String getMessage(String key)
+    public String getMessage(String key)
     {
+        if(!initialized)
+        {
+            throw new IllegalStateException();
+        }
         return messages.getString(key);
     }
+
+    public boolean IsInitialized()
+    {
+        return initialized;
+    }
+
+    public Locale getCurrentLocale()
+    {
+        return currentLocale;
+    }
+
+    public void reinitLanguage(Locale locale)
+    {
+        messages = ResourceBundle.getBundle("messages", locale);
+        currentLocale = locale;
+        Values.init(locale);
+        initialized = true;
+    }
+
 }

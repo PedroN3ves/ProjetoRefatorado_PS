@@ -9,18 +9,18 @@ public class PaymentProcessor
 
     public static boolean processPayment(String customerName, double amount)
     {
-        System.out.println(LanguageManager.getMessage("payment.title"));
-        System.out.println(LanguageManager.getMessage("payment.customer") + " " + customerName);
+        System.out.println(LanguageManager.INSTANCE.getMessage("payment.title"));
+        System.out.println(LanguageManager.INSTANCE.getMessage("payment.customer") + " " + customerName);
         System.out.println(MessageFormat.format(
-                LanguageManager.getMessage("payment.amount"),
+                LanguageManager.INSTANCE.getMessage("payment.amount"),
                 amount
         ));
-        System.out.println(LanguageManager.getMessage("payment.method"));
-        System.out.println(LanguageManager.getMessage("payment.option1"));
-        System.out.println(LanguageManager.getMessage("payment.option2"));
-        System.out.println(LanguageManager.getMessage("payment.option3"));
+        System.out.println(LanguageManager.INSTANCE.getMessage("payment.method"));
+        System.out.println(LanguageManager.INSTANCE.getMessage("payment.option1"));
+        System.out.println(LanguageManager.INSTANCE.getMessage("payment.option2"));
+        System.out.println(LanguageManager.INSTANCE.getMessage("payment.option3"));
 
-        System.out.print(LanguageManager.getMessage("payment.choice") + " ");
+        System.out.print(LanguageManager.INSTANCE.getMessage("payment.choice") + " ");
         int choice = scanner.nextInt();
         scanner.nextLine();
 
@@ -33,37 +33,37 @@ public class PaymentProcessor
             case 3:
                 return processBoleto();
             default:
-                System.out.println(LanguageManager.getMessage("payment.invalid"));
+                System.out.println(LanguageManager.INSTANCE.getMessage("payment.invalid"));
                 return false;
         }
     }
 
     private static boolean processCreditCard()
     {
-        System.out.print(LanguageManager.getMessage("card.number") + " ");
+        System.out.print(LanguageManager.INSTANCE.getMessage("card.number") + " ");
         String cardNumber = scanner.nextLine();
-        System.out.print(LanguageManager.getMessage("card.expiry") + " ");
+        System.out.print(LanguageManager.INSTANCE.getMessage("card.expiry") + " ");
         String expiry = scanner.nextLine();
-        System.out.print(LanguageManager.getMessage("card.cvv") + " ");
+        System.out.print(LanguageManager.INSTANCE.getMessage("card.cvv") + " ");
         String cvv = scanner.nextLine();
-        System.out.println(LanguageManager.getMessage("card.processing"));
-        System.out.println(LanguageManager.getMessage("card.approved"));
+        System.out.println(LanguageManager.INSTANCE.getMessage("card.processing"));
+        System.out.println(LanguageManager.INSTANCE.getMessage("card.approved"));
         return true;
     }
 
     private static boolean processPIX()
     {
-        System.out.println(LanguageManager.getMessage("pix.key"));
-        System.out.println(LanguageManager.getMessage("pix.waiting"));
-        System.out.println(LanguageManager.getMessage("pix.received"));
+        System.out.println(LanguageManager.INSTANCE.getMessage("pix.key"));
+        System.out.println(LanguageManager.INSTANCE.getMessage("pix.waiting"));
+        System.out.println(LanguageManager.INSTANCE.getMessage("pix.received"));
         return true;
     }
 
     private static boolean processBoleto()
     {
-        System.out.println(LanguageManager.getMessage("boleto.generating"));
-        System.out.println(LanguageManager.getMessage("boleto.generated"));
-        System.out.println(LanguageManager.getMessage("boleto.confirmed"));
+        System.out.println(LanguageManager.INSTANCE.getMessage("boleto.generating"));
+        System.out.println(LanguageManager.INSTANCE.getMessage("boleto.generated"));
+        System.out.println(LanguageManager.INSTANCE.getMessage("boleto.confirmed"));
         return true;
     }
 }

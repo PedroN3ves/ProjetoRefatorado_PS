@@ -20,13 +20,13 @@ public class AnalyticsManager
 
     public void showHotelAnalytics()
     {
-        System.out.println(LanguageManager.getMessage("analytics.prompt_hotel_name"));
+        System.out.println(LanguageManager.INSTANCE.getMessage("analytics.prompt_hotel_name"));
         String hotelName = scanner.nextLine();
         List<Room> hotelRooms = roomManager.getRoomsByHotel(hotelName);
 
         if (hotelRooms.isEmpty())
         {
-            System.out.println(LanguageManager.getMessage("analytics.no_rooms"));
+            System.out.println(LanguageManager.INSTANCE.getMessage("analytics.no_rooms"));
             return;
         }
 
@@ -44,7 +44,7 @@ public class AnalyticsManager
         }
 
         double occupancyRate = (occupied / (double)total) * 100;
-        System.out.printf(LanguageManager.getMessage("analytics.summary"),
+        System.out.printf(LanguageManager.INSTANCE.getMessage("analytics.summary"),
                 total, occupied, occupancyRate, revenue);
     }
 }

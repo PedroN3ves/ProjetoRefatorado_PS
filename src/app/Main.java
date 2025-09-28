@@ -25,26 +25,26 @@ public class Main
         BookingManager bookingManager = new BookingManager(scanner, customerManager, roomManager, hotelManager);
         ReviewManager reviewManager = new ReviewManager(scanner);
         AnalyticsManager analyticsManager = new AnalyticsManager(roomManager, scanner);
-        LanguageManager.initLanguage();
+        LanguageManager.INSTANCE.initLanguage();
 
         while (true)
         {
             System.out.println("\n-------- HOTEL BOOKING SYSTEM --------");
-            System.out.println("1. " + LanguageManager.getMessage("menu.option1"));
-            System.out.println("2. " + LanguageManager.getMessage("menu.option2"));
-            System.out.println("3. " + LanguageManager.getMessage("menu.option3"));
-            System.out.println("4. " + LanguageManager.getMessage("menu.option4"));
-            System.out.println("5. " + LanguageManager.getMessage("menu.option5"));
-            System.out.println("6. " + LanguageManager.getMessage("menu.option6"));
-            System.out.println("7. " + LanguageManager.getMessage("menu.option7"));
-            System.out.println("8. " + LanguageManager.getMessage("menu.option8"));
-            System.out.println("9. " + LanguageManager.getMessage("menu.option9"));
-            System.out.println("10. " + LanguageManager.getMessage("menu.option10"));
-            System.out.println("11. " + LanguageManager.getMessage("menu.option11"));
-            System.out.println("12. " + LanguageManager.getMessage("menu.option12"));
-            System.out.println("13. " + LanguageManager.getMessage("menu.option13"));
+            System.out.println("1. " + LanguageManager.INSTANCE.getMessage("menu.option1"));
+            System.out.println("2. " + LanguageManager.INSTANCE.getMessage("menu.option2"));
+            System.out.println("3. " + LanguageManager.INSTANCE.getMessage("menu.option3"));
+            System.out.println("4. " + LanguageManager.INSTANCE.getMessage("menu.option4"));
+            System.out.println("5. " + LanguageManager.INSTANCE.getMessage("menu.option5"));
+            System.out.println("6. " + LanguageManager.INSTANCE.getMessage("menu.option6"));
+            System.out.println("7. " + LanguageManager.INSTANCE.getMessage("menu.option7"));
+            System.out.println("8. " + LanguageManager.INSTANCE.getMessage("menu.option8"));
+            System.out.println("9. " + LanguageManager.INSTANCE.getMessage("menu.option9"));
+            System.out.println("10. " + LanguageManager.INSTANCE.getMessage("menu.option10"));
+            System.out.println("11. " + LanguageManager.INSTANCE.getMessage("menu.option11"));
+            System.out.println("12. " + LanguageManager.INSTANCE.getMessage("menu.option12"));
+            System.out.println("13. " + LanguageManager.INSTANCE.getMessage("menu.option13"));
             System.out.println("--------------------------------------");
-            System.out.print(LanguageManager.getMessage("choose_an_option"));
+            System.out.print(LanguageManager.INSTANCE.getMessage("choose_an_option"));
             String choice = scanner.nextLine();
 
             switch (choice)
@@ -89,12 +89,12 @@ public class Main
                     break;
                 case "13":
                 {
-                    System.out.println(LanguageManager.getMessage("exiting.msg"));
+                    System.out.println(LanguageManager.INSTANCE.getMessage("exiting.msg"));
                     scanner.close();
                     return;
                 }
                 default:
-                    System.out.println(LanguageManager.getMessage("default.msg"));
+                    System.out.println(LanguageManager.INSTANCE.getMessage("default.msg"));
             }
         }
     }

@@ -24,24 +24,24 @@ public class RoomManager
 
     public void addRoom()
     {
-        System.out.println(LanguageManager.getMessage("room.hotel_name"));
+        System.out.println(LanguageManager.INSTANCE.getMessage("room.hotel_name"));
         String hotelName = scanner.nextLine();
         Hotel hotel = hotelManager.getHotelByName(hotelName);
         if (hotel == null)
         {
-            System.out.println(LanguageManager.getMessage("room.hotel_not_found"));
+            System.out.println(LanguageManager.INSTANCE.getMessage("room.hotel_not_found"));
             return;
         }
 
-        System.out.println(LanguageManager.getMessage("room.room_number"));
+        System.out.println(LanguageManager.INSTANCE.getMessage("room.room_number"));
         String number = scanner.nextLine();
-        System.out.println(LanguageManager.getMessage("room.room_type"));
+        System.out.println(LanguageManager.INSTANCE.getMessage("room.room_type"));
         String type = scanner.nextLine();
 
         Double price = Values.getPrice(type);
         if (price == null)
         {
-            System.out.println(LanguageManager.getMessage("room.invalid"));
+            System.out.println(LanguageManager.INSTANCE.getMessage("room.invalid"));
             return;
         }
 
@@ -49,19 +49,19 @@ public class RoomManager
         {
             if (r.getHotelName().equalsIgnoreCase(hotelName) && r.getNumber().equals(number))
             {
-                System.out.println(LanguageManager.getMessage("room.exists"));
+                System.out.println(LanguageManager.INSTANCE.getMessage("room.exists"));
                 return;
             }
         }
 
         Room room = new Room(hotelName, number, type, price);
         rooms.add(room);
-        System.out.println(LanguageManager.getMessage("room.successful"));
+        System.out.println(LanguageManager.INSTANCE.getMessage("room.successful"));
     }
 
     public void listRooms()
     {
-        System.out.println(LanguageManager.getMessage("room.list_rooms"));
+        System.out.println(LanguageManager.INSTANCE.getMessage("room.list_rooms"));
         String hotelName = scanner.nextLine();
         boolean found = false;
         for (Room r : rooms)
@@ -74,7 +74,7 @@ public class RoomManager
         }
         if (!found)
         {
-            System.out.println(LanguageManager.getMessage("room.no_rooms"));
+            System.out.println(LanguageManager.INSTANCE.getMessage("room.no_rooms"));
         }
     }
 

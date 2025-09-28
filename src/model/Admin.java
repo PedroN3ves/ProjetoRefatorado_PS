@@ -14,7 +14,7 @@ public class Admin extends User
         public void addHotel(Hotel hotel)
         {
             String message = MessageFormat.format(
-                    LanguageManager.getMessage("admin.add"),
+                    LanguageManager.INSTANCE.getMessage("admin.add"),
                     hotel.getName()
             );
             System.out.println(message);

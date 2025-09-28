@@ -19,22 +19,22 @@ public class ReviewManager
 
     public void addReview()
     {
-        System.out.println(LanguageManager.getMessage("review.customer_email"));
+        System.out.println(LanguageManager.INSTANCE.getMessage("review.customer_email"));
         String email = scanner.nextLine();
-        System.out.println(LanguageManager.getMessage("review.hotel_name"));
+        System.out.println(LanguageManager.INSTANCE.getMessage("review.hotel_name"));
         String hotelName = scanner.nextLine();
-        System.out.println(LanguageManager.getMessage("review.rating"));
+        System.out.println(LanguageManager.INSTANCE.getMessage("review.rating"));
         int rating = Integer.parseInt(scanner.nextLine());
-        System.out.println(LanguageManager.getMessage("review.comment"));
+        System.out.println(LanguageManager.INSTANCE.getMessage("review.comment"));
         String comment = scanner.nextLine();
 
         reviews.add(new Review(email, hotelName, rating, comment));
-        System.out.println(LanguageManager.getMessage("review.added"));
+        System.out.println(LanguageManager.INSTANCE.getMessage("review.added"));
     }
 
     public void showReviews()
     {
-        System.out.println(LanguageManager.getMessage("review.show_reviews"));
+        System.out.println(LanguageManager.INSTANCE.getMessage("review.show_reviews"));
         String hotelName = scanner.nextLine();
         boolean found = false;
         for (Review r : reviews)
@@ -47,7 +47,7 @@ public class ReviewManager
         }
         if (!found)
         {
-            System.out.println(LanguageManager.getMessage("review.not_found"));
+            System.out.println(LanguageManager.INSTANCE.getMessage("review.not_found"));
         }
     }
 }

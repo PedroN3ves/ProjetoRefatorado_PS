@@ -56,20 +56,20 @@ public class BookingManager
 
     public void bookRoom()
     {
-        System.out.println(LanguageManager.getMessage("booking.customer_email"));
+        System.out.println(LanguageManager.INSTANCE.getMessage("booking.payment_failed"));
         String email = scanner.nextLine();
         Customer customer = customerManager.getCustomerByEmail(email);
         if (customer == null)
         {
-            System.out.println(LanguageManager.getMessage("booking.customer_not_found"));
+            System.out.println(LanguageManager.INSTANCE.getMessage("booking.customer_not_found"));
             return;
         }
 
-        System.out.println(LanguageManager.getMessage("booking.hotel_name"));
+        System.out.println(LanguageManager.INSTANCE.getMessage("booking.hotel_name"));
         String hotelName = scanner.nextLine();
-        System.out.println(LanguageManager.getMessage("booking.room_number"));
+        System.out.println(LanguageManager.INSTANCE.getMessage("booking.room_number"));
         String roomNumber = scanner.nextLine();
-        System.out.println(LanguageManager.getMessage("booking.days"));
+        System.out.println(LanguageManager.INSTANCE.getMessage("booking.days"));
         String daysString = scanner.nextLine();
 
         days = Integer.parseInt(daysString);
@@ -77,13 +77,13 @@ public class BookingManager
         Room room = roomManager.getAvailableRoom(hotelName, roomNumber);
         if (room == null)
         {
-            System.out.println(LanguageManager.getMessage("booking.room_not_available"));
+            System.out.println(LanguageManager.INSTANCE.getMessage("booking.room_not_available"));
             return;
         }
 
         Hotel hotel = hotelManager.getHotelByName(room.getHotelName());
 
-        System.out.println(LanguageManager.getMessage("booking.type"));
+        System.out.println(LanguageManager.INSTANCE.getMessage("booking.type"));
         int typeChoice = Integer.parseInt(scanner.nextLine());
 
         Reservation reservation = createReservationFactory(typeChoice, customer, hotel, room, days);
@@ -92,21 +92,21 @@ public class BookingManager
         boolean paid = PaymentProcessor.processPayment(customer.getName(), amount);
         if (!paid)
         {
-            System.out.println(LanguageManager.getMessage("booking.payment_failed"));
+            System.out.println(LanguageManager.INSTANCE.getMessage("booking.payment_failed"));
             return;
         }
 
         room.setAvailable(false);
         bookings.add(reservation);
         customerManager.addLoyaltyPoints(email, 10);
-        System.out.println(MessageFormat.format(LanguageManager.getMessage("booking.success"), roomNumber, hotelName, customerManager.getLoyaltyPoints(email)));
+        System.out.println(MessageFormat.format(LanguageManager.INSTANCE.getMessage("booking.success"), roomNumber, hotelName, customerManager.getLoyaltyPoints(email)));
     }
 
     public void cancelBooking()
     {
-        System.out.println(LanguageManager.getMessage("booking.cancel_hotel"));
+        System.out.println(LanguageManager.INSTANCE.getMessage("booking.cancel_hotel"));
         String hotelName = scanner.nextLine();
-        System.out.println(LanguageManager.getMessage("booking.cancel_room"));
+        System.out.println(LanguageManager.INSTANCE.getMessage("booking.cancel_room"));
         String roomNumber = scanner.nextLine();
 
         Iterator<Reservation> iterator = bookings.iterator();
@@ -121,10 +121,10 @@ public class BookingManager
                     room.setAvailable(true);
                 }
                 iterator.remove();
-                System.out.println(LanguageManager.getMessage("booking.cancelled"));
+                System.out.println(LanguageManager.INSTANCE.getMessage("booking.cancelled"));
                 return;
             }
         }
-        System.out.println(LanguageManager.getMessage("booking.not_found"));
+        System.out.println(LanguageManager.INSTANCE.getMessage("booking.not_found"));
     }
 }

@@ -55,11 +55,11 @@ public class Room
     public String toString()
     {
         String status = isAvailable() ?
-                LanguageManager.getMessage("room.status.available") :
-                LanguageManager.getMessage("room.status.occupied");
+                LanguageManager.INSTANCE.getMessage("room.status.available") :
+                LanguageManager.INSTANCE.getMessage("room.status.occupied");
 
         return MessageFormat.format(
-                LanguageManager.getMessage("room.display_format"),
+                LanguageManager.INSTANCE.getMessage("room.display_format"),
                 number,
                 type,
                 price,
