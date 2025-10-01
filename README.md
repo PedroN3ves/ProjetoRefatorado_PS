@@ -1,7 +1,6 @@
 # Sistema de Reservas de Hotéis
 
-Projeto Utilizado no refatoramento: Online Booking System in Hotels
-Este projeto é um sistema de reservas de hotéis desenvolvido em Java para rodar no terminal.
+Projeto Utilizado no refatoramento: Online Booking System in Hotels, este projeto é um sistema de reservas de hotéis desenvolvido em Java para rodar no terminal.
 Não foi adicionada nenhuma nova funcionalidade, apenas refarodas as existentes
 
 ## Funcionalidades Principais
