@@ -39,7 +39,9 @@ public class HotelManager
             }
         }
 
-        Hotel newHotel = new Hotel(name, address, description);
+        Hotel newHotel = new Hotel.Builder(name, address)
+                .description(description)
+                .build();
         hotels.add(newHotel);
         admin.addHotel(newHotel);
     }
