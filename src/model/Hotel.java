@@ -160,10 +160,6 @@ public class Hotel
 
             return new Hotel(this);
         }
-
-
-
-
     }
 
     public String getName() { return name; }
@@ -185,8 +181,8 @@ public class Hotel
     public String toString()
     {
         return String.format(
-                "Hotel: %s\nEndereço: %s\nEstrelas: %d\nDescrição: %s",
-                name, address, starRating, description
+                "Hotel: %s\nEndereço: %s\nDescrição: %s",
+                name, address, description
         );
     }
 }

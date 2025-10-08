@@ -1,6 +1,8 @@
 package manager;
 
 import model.Customer;
+import model.Reservation;
+import strategy.LoyaltyPointsStrategy;
 import util.LanguageManager;
 
 import java.text.MessageFormat;
@@ -11,6 +13,7 @@ import java.util.Scanner;
 public class CustomerManager
 {
     private List<Customer> customers = new ArrayList<>();
+    private LoyaltyPointsStrategy pointsStrategy;
     private Scanner scanner;
 
     public CustomerManager(Scanner scanner)
@@ -50,6 +53,21 @@ public class CustomerManager
         }
         return null;
     }
+
+    public void setPointsStrategy(LoyaltyPointsStrategy strategy)
+    {
+        this.pointsStrategy = strategy;
+    }
+
+    public void addReservationPoints(Reservation reservation)
+    {
+        if (pointsStrategy != null)
+        {
+            int points = pointsStrategy.calculatePoints(reservation);
+            addLoyaltyPoints(reservation.getCustomer().getEmail(), points);
+        }
+    }
+
 
     public void addLoyaltyPoints(String email, int points)
     {

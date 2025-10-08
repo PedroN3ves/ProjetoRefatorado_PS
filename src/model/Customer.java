@@ -20,4 +20,21 @@ public class Customer extends User
         this.loyaltyPoints += points;
     }
 
+    public boolean removeLoyaltyPoints(int points)
+    {
+        if (points <= 0)
+        {
+            throw new IllegalArgumentException();
+        }
+
+        if (this.loyaltyPoints >= points)
+        {
+            this.loyaltyPoints -= points;
+            return true;
+        } else
+        {
+            this.loyaltyPoints = 0;
+            return false;
+        }
+    }
 }

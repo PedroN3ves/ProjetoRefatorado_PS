@@ -2,6 +2,10 @@ package manager;
 
 import factory.*;
 import model.*;
+import strategy.CorporatePoinstsStrategy;
+import strategy.LoyaltyPointsStrategy;
+import strategy.PromoPointsStrategy;
+import strategy.StandardPointsStrategy;
 import util.PaymentProcessor;
 import util.LanguageManager;
 import java.text.MessageFormat;
@@ -88,6 +92,17 @@ public class BookingManager
 
         Reservation reservation = createReservationFactory(typeChoice, customer, hotel, room, days);
 
+        LoyaltyPointsStrategy strategy = switch (typeChoice) {
+            case 1 ->
+                    new StandardPointsStrategy();
+            case 2 ->
+                    new PromoPointsStrategy();
+            case 3 ->
+                    new CorporatePoinstsStrategy();
+            default ->
+                    new StandardPointsStrategy();
+        };
+
         amount = reservation.getTotalCost();
         boolean paid = PaymentProcessor.processPayment(customer.getName(), amount);
         if (!paid)
@@ -98,7 +113,8 @@ public class BookingManager
 
         room.setAvailable(false);
         bookings.add(reservation);
-        customerManager.addLoyaltyPoints(email, 10);
+        customerManager.setPointsStrategy(strategy);
+        customerManager.addReservationPoints(reservation);
         System.out.println(MessageFormat.format(LanguageManager.INSTANCE.getMessage("booking.success"), roomNumber, hotelName, customerManager.getLoyaltyPoints(email)));
     }
 
