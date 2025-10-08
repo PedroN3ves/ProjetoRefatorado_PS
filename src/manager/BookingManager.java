@@ -2,6 +2,7 @@ package manager;
 
 import factory.*;
 import model.*;
+import observer.ReservationObserver;
 import strategy.CorporatePoinstsStrategy;
 import strategy.LoyaltyPointsStrategy;
 import strategy.PromoPointsStrategy;
@@ -24,6 +25,7 @@ public class BookingManager
     private HotelManager hotelManager;
     private int days;
     private double amount;
+    private List<ReservationObserver> observers = new ArrayList<>();
 
     public BookingManager(Scanner scanner, CustomerManager customerManager, RoomManager roomManager, HotelManager hotelManager)
     {
@@ -51,16 +53,39 @@ public class BookingManager
         }
     }
 
-
     private Reservation createReservationFactory(int type,Customer customer,Hotel hotel,Room room, int days)
     {
         ReservationFactory factory = getTypeReservation(type);
         return factory.createReservation(customer, hotel, room, days);
     }
 
+    public void addObserver(ReservationObserver observer)
+    {
+        observers.add(observer);
+    }
+
+    public void removeObserver(ReservationObserver observer)
+    {
+        observers.remove(observer);
+    }
+
+    private void notifyReservationCreated(Reservation reservation)
+    {
+        for (ReservationObserver observer : observers) {
+            observer.onReservationCreated(reservation);
+        }
+    }
+
+    private void notifyReservationCancelled(Reservation reservation)
+    {
+        for (ReservationObserver observer : observers) {
+            observer.onReservationCancelled(reservation);
+        }
+    }
+
     public void bookRoom()
     {
-        System.out.println(LanguageManager.INSTANCE.getMessage("booking.payment_failed"));
+        System.out.println(LanguageManager.INSTANCE.getMessage("booking.customer_email"));
         String email = scanner.nextLine();
         Customer customer = customerManager.getCustomerByEmail(email);
         if (customer == null)
@@ -113,8 +138,11 @@ public class BookingManager
 
         room.setAvailable(false);
         bookings.add(reservation);
+
         customerManager.setPointsStrategy(strategy);
         customerManager.addReservationPoints(reservation);
+
+        notifyReservationCreated(reservation);
         System.out.println(MessageFormat.format(LanguageManager.INSTANCE.getMessage("booking.success"), roomNumber, hotelName, customerManager.getLoyaltyPoints(email)));
     }
 
@@ -137,6 +165,8 @@ public class BookingManager
                     room.setAvailable(true);
                 }
                 iterator.remove();
+
+                notifyReservationCancelled(r);
                 System.out.println(LanguageManager.INSTANCE.getMessage("booking.cancelled"));
                 return;
             }
