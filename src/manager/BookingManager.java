@@ -136,7 +136,8 @@ public class BookingManager
             return;
         }
 
-        room.setAvailable(false);
+        room.book();
+
         bookings.add(reservation);
 
         customerManager.setPointsStrategy(strategy);
@@ -162,7 +163,7 @@ public class BookingManager
                 Room room = roomManager.getRoom(hotelName, roomNumber);
                 if (room != null)
                 {
-                    room.setAvailable(true);
+                    room.makeAvailable();
                 }
                 iterator.remove();
 

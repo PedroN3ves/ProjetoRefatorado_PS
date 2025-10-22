@@ -42,7 +42,9 @@ public class Main
             System.out.println("10. " + LanguageManager.INSTANCE.getMessage("menu.option10"));
             System.out.println("11. " + LanguageManager.INSTANCE.getMessage("menu.option11"));
             System.out.println("12. " + LanguageManager.INSTANCE.getMessage("menu.option12"));
-            System.out.println("13. " + LanguageManager.INSTANCE.getMessage("menu.option13"));
+            System.out.println("13. " + LanguageManager.INSTANCE.getMessage("menu.option13")); // Agora é Manutenção
+            System.out.println("14. " + LanguageManager.INSTANCE.getMessage("menu.option14")); // Agora é Sair
+
             System.out.println("--------------------------------------");
             System.out.print(LanguageManager.INSTANCE.getMessage("choose_an_option"));
             String choice = scanner.nextLine();
@@ -87,7 +89,10 @@ public class Main
                 case "12":
                     CustomerSupport.openSupportMenu();
                     break;
-                case "13":
+                case "13": // Chama "Put Room in Maintenance"
+                    roomManager.setRoomMaintenance();
+                    break;
+                case "14": // Chama "Exit"
                 {
                     System.out.println(LanguageManager.INSTANCE.getMessage("exiting.msg"));
                     scanner.close();

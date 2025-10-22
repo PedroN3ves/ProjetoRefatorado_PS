@@ -1,5 +1,7 @@
 package model;
 
+import model.state.AvailableState;
+import model.state.RoomState;
 import util.LanguageManager;
 
 import java.text.MessageFormat;
@@ -10,7 +12,7 @@ public class Room
     private String number;
     private String type;
     private double price;
-    private boolean available;
+    private RoomState state;
 
     public Room(String hotelName, String number, String type, double price)
     {
@@ -18,7 +20,27 @@ public class Room
         this.number = number;
         this.type = type;
         this.price = price;
-        this.available = true;
+        this.state = new AvailableState();
+    }
+
+    public void book()
+    {
+        state.book(this);
+    }
+
+    public void makeAvailable()
+    {
+        state.makeAvailable(this);
+    }
+
+    public void putInMaintenance()
+    {
+        state.markForMaintenance(this);
+    }
+
+    public void setState(RoomState state)
+    {
+        this.state = state;
     }
 
     public String getHotelName()
@@ -43,20 +65,15 @@ public class Room
 
     public boolean isAvailable()
     {
-        return available;
-    }
-
-    public void setAvailable(boolean status)
-    {
-        this.available = status;
+        return state.isAvailable();
     }
 
     @Override
     public String toString()
     {
-        String status = isAvailable() ?
-                LanguageManager.INSTANCE.getMessage("room.status.available") :
-                LanguageManager.INSTANCE.getMessage("room.status.occupied");
+        String statusKey = state.getStatusKey();
+
+        String status = LanguageManager.INSTANCE.getMessage(statusKey);
 
         return MessageFormat.format(
                 LanguageManager.INSTANCE.getMessage("room.display_format"),

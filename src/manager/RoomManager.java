@@ -114,4 +114,21 @@ public class RoomManager
         }
         return result;
     }
+
+    public void setRoomMaintenance()
+    {
+        System.out.println(LanguageManager.INSTANCE.getMessage("room.hotel_name"));
+        String hotelName = scanner.nextLine();
+        System.out.println(LanguageManager.INSTANCE.getMessage("room.room_number"));
+        String roomNumber = scanner.nextLine();
+
+        Room room = getRoom(hotelName, roomNumber);
+        if (room == null)
+        {
+            System.out.println(LanguageManager.INSTANCE.getMessage("room.no_rooms"));
+            return;
+        }
+
+        room.putInMaintenance();
+    }
 }
