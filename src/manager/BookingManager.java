@@ -3,11 +3,12 @@ package manager;
 import factory.*;
 import model.*;
 import observer.ReservationObserver;
+import payment.IPaymentGateway;
+import payment.PaymentGatewayFactory;
 import strategy.CorporatePoinstsStrategy;
 import strategy.LoyaltyPointsStrategy;
 import strategy.PromoPointsStrategy;
 import strategy.StandardPointsStrategy;
-import util.PaymentProcessor;
 import util.LanguageManager;
 import java.text.MessageFormat;
 
@@ -18,14 +19,14 @@ import java.util.Scanner;
 
 public class BookingManager
 {
-    private List<Reservation> bookings = new ArrayList<>();
-    private Scanner scanner;
-    private CustomerManager customerManager;
-    private RoomManager roomManager;
-    private HotelManager hotelManager;
+    private final List<Reservation> bookings = new ArrayList<>();
+    private final Scanner scanner;
+    private final CustomerManager customerManager;
+    private final RoomManager roomManager;
+    private final HotelManager hotelManager;
     private int days;
     private double amount;
-    private List<ReservationObserver> observers = new ArrayList<>();
+    private final List<ReservationObserver> observers = new ArrayList<>();
 
     public BookingManager(Scanner scanner, CustomerManager customerManager, RoomManager roomManager, HotelManager hotelManager)
     {
@@ -129,7 +130,35 @@ public class BookingManager
         };
 
         amount = reservation.getTotalCost();
-        boolean paid = PaymentProcessor.processPayment(customer.getName(), amount);
+
+        System.out.println(LanguageManager.INSTANCE.getMessage("payment.method"));
+        System.out.println(LanguageManager.INSTANCE.getMessage("payment.option1"));
+        System.out.println(LanguageManager.INSTANCE.getMessage("payment.option2"));
+        System.out.println(LanguageManager.INSTANCE.getMessage("payment.option3"));
+        System.out.print(LanguageManager.INSTANCE.getMessage("payment.choice") + " ");
+
+        int paymentChoice;
+        try
+        {
+            paymentChoice = Integer.parseInt(scanner.nextLine());
+        } catch (NumberFormatException e)
+        {
+            paymentChoice = -1;
+        }
+
+        IPaymentGateway gateway = PaymentGatewayFactory.getGateway(paymentChoice, scanner);
+        boolean paid;
+
+        if (gateway == null)
+        {
+            System.out.println(LanguageManager.INSTANCE.getMessage("payment.invalid"));
+            paid = false;
+        } else
+        {
+            paid = gateway.processPayment(customer.getName(), amount);
+        }
+
+
         if (!paid)
         {
             System.out.println(LanguageManager.INSTANCE.getMessage("booking.payment_failed"));
