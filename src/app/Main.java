@@ -1,14 +1,7 @@
 package app;
 
-import manager.HotelManager;
-import manager.RoomManager;
-import manager.CustomerManager;
-import manager.BookingManager;
-import manager.ReviewManager;
-import manager.AnalyticsManager;
 
-import model.Admin;
-import util.CustomerSupport;
+import facade.HotelSystemFacade;
 import util.LanguageManager;
 
 import java.util.Scanner;
@@ -18,14 +11,8 @@ public class Main
     public static void main(String[] args)
     {
         Scanner scanner = new Scanner(System.in);
-
-        HotelManager hotelManager = new HotelManager(scanner);
-        RoomManager roomManager = new RoomManager(scanner, hotelManager);
-        CustomerManager customerManager = new CustomerManager(scanner);
-        BookingManager bookingManager = new BookingManager(scanner, customerManager, roomManager, hotelManager);
-        ReviewManager reviewManager = new ReviewManager(scanner);
-        AnalyticsManager analyticsManager = new AnalyticsManager(roomManager, scanner);
         LanguageManager.INSTANCE.initLanguage();
+        HotelSystemFacade facade = new HotelSystemFacade(scanner);
 
         while (true)
         {
@@ -42,8 +29,8 @@ public class Main
             System.out.println("10. " + LanguageManager.INSTANCE.getMessage("menu.option10"));
             System.out.println("11. " + LanguageManager.INSTANCE.getMessage("menu.option11"));
             System.out.println("12. " + LanguageManager.INSTANCE.getMessage("menu.option12"));
-            System.out.println("13. " + LanguageManager.INSTANCE.getMessage("menu.option13")); // Agora é Manutenção
-            System.out.println("14. " + LanguageManager.INSTANCE.getMessage("menu.option14")); // Agora é Sair
+            System.out.println("13. " + LanguageManager.INSTANCE.getMessage("menu.option13"));
+            System.out.println("14. " + LanguageManager.INSTANCE.getMessage("menu.option14"));
 
             System.out.println("--------------------------------------");
             System.out.print(LanguageManager.INSTANCE.getMessage("choose_an_option"));
@@ -52,47 +39,45 @@ public class Main
             switch (choice)
             {
                 case "1":
-                    hotelManager.addHotel();
+                    facade.addHotel();
                     break;
                 case "2":
-                    hotelManager.listHotels();
+                    facade.listHotels();
                     break;
                 case "3":
-                    roomManager.addRoom();
+                    facade.addRoom();
                     break;
                 case "4":
-                    roomManager.listRooms();
+                    facade.listRooms();
                     break;
                 case "5":
-                    customerManager.createCustomer();
+                    facade.createCustomer();
                     break;
                 case "6":
-                    bookingManager.bookRoom();
+                    facade.bookRoom();
                     break;
                 case "7":
-                    bookingManager.cancelBooking();
+                    facade.cancelBooking();
                     break;
                 case "8":
-                    reviewManager.addReview();
+                    facade.addReview();
                     break;
                 case "9":
-                    reviewManager.showReviews();
+                    facade.showReviews();
                     break;
                 case "10":
-                {
-                    analyticsManager.showHotelAnalytics();
+                    facade.showHotelAnalytics();
                     break;
-                }
                 case "11":
-                    customerManager.showLoyaltyPoints();
+                    facade.showLoyaltyPoints();
                     break;
                 case "12":
-                    CustomerSupport.openSupportMenu();
+                    facade.openCustomerSupport();
                     break;
-                case "13": // Chama "Put Room in Maintenance"
-                    roomManager.setRoomMaintenance();
+                case "13":
+                    facade.setRoomMaintenance();
                     break;
-                case "14": // Chama "Exit"
+                case "14":
                 {
                     System.out.println(LanguageManager.INSTANCE.getMessage("exiting.msg"));
                     scanner.close();
