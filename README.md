@@ -9,12 +9,12 @@ Não foi adicionada nenhuma nova funcionalidade, apenas refatoradas as existente
 #### 1.Factory Method
 - Onde: `factory/` package e `BookingManager`
 - Propósito: Criar diferentes tipos de reservas (Standard, Promocional, Corporativa)
-- Implementação: 
-  - `ReservationFactory` interface
-  - `StandardReservationFactory`, `PromoReservationFactory`, `CorporativeReservationFactory`
+- Implementação:
+    - `ReservationFactory` interface
+    - `StandardReservationFactory`, `PromoReservationFactory`, `CorporativeReservationFactory`
 - Benefício: Desacoplamento na criação de objetos e fácil extensão para novos tipos de reserva
 
-#### 2. Singleton                                                               
+#### 2. Singleton
 - Onde: `util/LanguageManager`
 - Propósito: Garantir uma única instância global do gerenciador de idiomas
 - Implementação: Enum singleton thread-safe
@@ -26,13 +26,32 @@ Não foi adicionada nenhuma nova funcionalidade, apenas refatoradas as existente
 - Implementação: `Hotel.Builder` classe interna
 - Benefício: Código mais legível e construção passo-a-passo de objetos complexos
 
+### Padrões Estruturais
+#### 1. Facade
+- Onde: `facade/HotelSystemFacade`
+- Propósito: Prover uma interface simplificada para um subsistema complexo (os vários managers)
+- Implementação: `HotelSystemFacade` centraliza as chamadas do `app/Main` e as delega para `HotelManager`, `RoomManager`, `BookingManager`, etc.
+- Benefício: Reduz o acoplamento entre o cliente (Main) e a lógica de negócio interna.
+
+#### 2. Adapter
+- Onde: `payment/adapters/` package e `payment/PaymentGatewayFactory`
+- Propósito: Permitir que diferentes gateways de pagamento sejam usados através de uma interface comum (`IPaymentGateway`)
+- Implementação: `CreditCardAdapter`, `PixAdapter`, `BoletoAdapter` implementam `IPaymentGateway`.
+- Benefício: Flexibilidade para adicionar novos métodos de pagamento sem alterar a lógica de `BookingManager`.
+
+#### 3. Composite
+- Onde: `model/IEntidadeHoteleira`, `model/Hotel`, `model/GrupoHotel`
+- Propósito: Tratar objetos individuais (Hotel) e composições de objetos (GrupoHotel) de maneira uniforme.
+- Implementação: `Hotel` e `GrupoHotel` implementam a interface `IEntidadeHoteleira`.
+- Benefício: Permite que o cliente trate um hotel ou um grupo de hotéis da mesma forma (ex: `exibirDetalhes()`).
+
 ### Padrões Comportamentais
 #### 1. Strategy
 - Onde: `strategy/` package e `BookingManager`
 - Propósito: Definir diferentes algoritmos para cálculo de pontos de fidelidade
 - Implementação:
     - `LoyaltyPointsStrategy` interface
-    - `StandardPointsStrategy`, `PromoPointsStrategy`, `CorporatePointsStrategy`
+    - `StandardPointsStrategy`, `PromoPointsStrategy`, `CorporatePoinstsStrategy`
 - Benefício: Flexibilidade para alterar regras de pontuação sem modificar o código cliente
 
 #### 2. Observer
@@ -43,6 +62,14 @@ Não foi adicionada nenhuma nova funcionalidade, apenas refatoradas as existente
     - `EmailNotificationObserver`, `SystemLogObserver`
 - Benefício: Desacoplamento entre a lógica de negócio e sistemas de notificação
 
+#### 3. State
+- Onde: `model/state/` package e `model/Room`
+- Propósito: Permitir que um objeto (Room) altere seu comportamento quando seu estado interno muda.
+- Implementação:
+    - `RoomState` interface
+    - `AvailableState`, `OccupiedState`, `MaintenanceState`
+- Benefício: Evita condicionais complexas (if/else) na classe `Room` e facilita a adição de novos estados.
+
 ## Funcionalidades Principais
 
 ### Gestão de Hotéis
@@ -52,19 +79,19 @@ Não foi adicionada nenhuma nova funcionalidade, apenas refatoradas as existente
 ### Gestão de Quartos
 - Adicionar quartos a hotéis existentes com número, tipo (Single, Couple, Premium etc.) e preço
 - Listar quartos disponíveis por hotel
+- Colocar quartos em manutenção (padrão State)
 
 ### Gestão de Clientes
-- Criar perfis de clientes com nome, e-mail e CPF
+- Criar perfis de clientes com nome, e-mail
 - Consultar pontos de fidelidade acumulados
 
 ### Reservas
-- Reservar quartos disponíveis informando hotel, número do quarto e CPF do cliente
+- Reservar quartos disponíveis informando hotel, número do quarto e e-mail do cliente
 - Cancelar reservas existentes
-- Suporte a diferentes tipos de reservas:
-  - Padrão
-  - Promocional
-  - Corporativa
-- Exibir relatório de reservas
+- Suporte a diferentes tipos de reservas (padrão Factory Method):
+    - Padrão
+    - Promocional
+    - Corporativa
 
 ### Sistema de Pontos de Fidelidade
 - Cálculo dinâmico de pontos baseado no tipo de reserva (Strategy Pattern)
@@ -76,7 +103,7 @@ Não foi adicionada nenhuma nova funcionalidade, apenas refatoradas as existente
 
 ### Sistema de Notificações
 - Notificação por email para clientes (Observer Pattern)
-- Registro em log do sistema para auditoria
+- Registro em log do sistema para auditoria (Observer Pattern)
 - Notificações automáticas para eventos de reserva e cancelamento
 
 ### Avaliações
@@ -84,37 +111,37 @@ Não foi adicionada nenhuma nova funcionalidade, apenas refatoradas as existente
 - Listar todas as avaliações de cada hotel
 
 ### Relatórios Analíticos
-- Hotel mais reservado
-- Quarto mais caro e mais barato
-- Hotel com melhor avaliação
-- Hotel com mais pontos de fidelidade acumulados
+- Exibir taxa de ocupação e receita estimada por hotel
 
 ### Suporte a Múltiplos Idiomas
-- Suporte completo para:
-  - Português 🇧🇷
-  - Inglês 🇺🇸
-  - Espanhol 🇪🇸
+- Suporte completo para (Singleton Pattern):
+    - Português 🇧🇷
+    - Inglês 🇺🇸
+    - Espanhol 🇪🇸
 - Seleção do idioma logo ao iniciar o sistema
 
 ### Simulação de Pagamento
-- Processamento fictício de pagamento no terminal
-- Exibição do valor total e confirmação da transação
+- Processamento de pagamento no terminal (Adapter Pattern)
+- Suporte a Cartão de Crédito, PIX e Boleto
 
 ### Suporte ao Cliente (Simulado)
 - Interface de suporte fictícia com interações no terminal
-- Simulação de atendimento humano
 
 ## Estrutura do Projeto
 
 O código está organizado em pacotes:
 
 - `app` → ponto de entrada da aplicação (Main.java)
+- `facade` → implementação do Facade Pattern
 - `manager` → classes que implementam a lógica do sistema (reservas, hotéis, clientes, relatórios etc.)
-- `model` → entidades principais do sistema (Hotel, Room, Customer, Reservation, Booking, Review, User, Admin etc.)
-- `util` → funcionalidades auxiliares como processador de pagamento, gerenciador de idiomas e suporte ao cliente
+- `model` → entidades principais do sistema (Hotel, Room, Customer, Reservation etc.)
+- `model/state` → implementação do State Pattern
+- `util` → funcionalidades auxiliares (gerenciador de idiomas, suporte ao cliente)
 - `factory` → implementação do Factory Method para criação de reservas
 - `strategy` → implementação do Strategy Pattern para cálculo de pontos
 - `observer` → implementação do Observer Pattern para sistema de notificações
+- `payment` → implementação do Adapter Pattern para gateways de pagamento
+- `resources` → arquivos de propriedades para internacionalização (i18n)
 
 ## Como Executar
 
@@ -122,7 +149,7 @@ O código está organizado em pacotes:
 - JDK 17 ou superior instalado
 
 **Compilar o projeto:**
-No terminal, entre na pasta src e execute:
+No terminal, entre na pasta `src` e execute:
 
 ```bash
 javac app/Main.java
