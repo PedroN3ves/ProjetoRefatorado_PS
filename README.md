@@ -15,10 +15,10 @@ Não foi adicionada nenhuma nova funcionalidade, apenas refatoradas as existente
 - Benefício: Desacoplamento na criação de objetos e fácil extensão para novos tipos de reserva
 
 #### 2. Singleton
-- Onde: `util/LanguageManager`
-- Propósito: Garantir uma única instância global do gerenciador de idiomas
-- Implementação: Enum singleton thread-safe
-- Benefício: Acesso consistente ao gerenciador de idiomas em todo o sistema
+- Onde: `util/LanguageManager` e `util/DatabaseManager`
+- Propósito: Garantir uma única instância global do gerenciador de idiomas e da conexão com o banco.
+- Implementação: Enum singleton (`LanguageManager`) e Singleton clássico (`DatabaseManager`).
+- Benefício: Acesso consistente aos recursos compartilhados em todo o sistema.
 
 #### 3. Builder
 - Onde: `model/Hotel`
@@ -42,7 +42,7 @@ Não foi adicionada nenhuma nova funcionalidade, apenas refatoradas as existente
 #### 3. Composite
 - Onde: `model/IEntidadeHoteleira`, `model/Hotel`, `model/GrupoHotel`
 - Propósito: Tratar objetos individuais (Hotel) e composições de objetos (GrupoHotel) de maneira uniforme.
-- Implementação: `Hotel` e `GrupoHotel` implementam a interface `IEntidadeHoteleira`.
+- Implementação: `Hotel` e `GrupoHotel` implementam η interface `IEntidadeHoteleira`.
 - Benefício: Permite que o cliente trate um hotel ou um grupo de hotéis da mesma forma (ex: `exibirDetalhes()`).
 
 ### Padrões Comportamentais
@@ -99,7 +99,6 @@ Não foi adicionada nenhuma nova funcionalidade, apenas refatoradas as existente
     - Standard: 10% do valor da reserva
     - Promocional: 5% do valor da reserva
     - Corporativa: 15% do valor da reserva
-- Remoção automática de pontos em caso de cancelamento
 
 ### Sistema de Notificações
 - Notificação por email para clientes (Observer Pattern)
@@ -109,6 +108,10 @@ Não foi adicionada nenhuma nova funcionalidade, apenas refatoradas as existente
 ### Avaliações
 - Clientes podem avaliar hotéis após a estadia
 - Listar todas as avaliações de cada hotel
+
+### Persistência de Dados
+- O sistema utiliza um banco de dados **SQLite** (`hotel_booking.db`) para persistir todos os dados.
+- Hotéis, quartos, clientes, reservas e avaliações são salvos automaticamente e recarregados quando o programa é reiniciado.
 
 ### Relatórios Analíticos
 - Exibir taxa de ocupação e receita estimada por hotel
@@ -136,7 +139,7 @@ O código está organizado em pacotes:
 - `manager` → classes que implementam a lógica do sistema (reservas, hotéis, clientes, relatórios etc.)
 - `model` → entidades principais do sistema (Hotel, Room, Customer, Reservation etc.)
 - `model/state` → implementação do State Pattern
-- `util` → funcionalidades auxiliares (gerenciador de idiomas, suporte ao cliente)
+- `util` → funcionalidades auxiliares (gerenciador de idiomas, suporte ao cliente, gerenciador de banco de dados)
 - `factory` → implementação do Factory Method para criação de reservas
 - `strategy` → implementação do Strategy Pattern para cálculo de pontos
 - `observer` → implementação do Observer Pattern para sistema de notificações
@@ -147,9 +150,56 @@ O código está organizado em pacotes:
 
 **Pré-requisitos:**
 - JDK 17 ou superior instalado
+- (Opcional, recomendado) IntelliJ IDEA Community Edition ou outra IDE Java
 
-**Compilar o projeto:**
-No terminal, entre na pasta `src` e execute:
+---
 
-```bash
-javac app/Main.java
+### Método 1: Executando no IntelliJ IDEA
+
+1.  **Clone o repositório** e abra a pasta do projeto no IntelliJ IDEA.
+2.  **Adicione a dependência do SQLite:**
+    -   Vá em `File` > `Project Structure...` (ou `Ctrl+Alt+Shift+S`).
+    -   No menu da esquerda, selecione `Libraries`.
+    -   Clique no ícone `+` (Adicionar) e escolha `From Maven...`.
+    -   Na caixa de busca, digite: `org.xerial:sqlite-jdbc`
+    -   Selecione a versão mais recente na lista (ex: `3.46.0.1`) e clique em `OK`.
+    -   Clique em `OK` novamente para fechar a janela de Estrutura do Projeto.
+3.  **Execute o projeto:**
+    -   Encontre o arquivo `src/app/Main.java` na árvore de projeto.
+    -   Clique com o botão direito nele e selecione `Run 'Main.main()'`.
+4.  Na primeira execução, o banco de dados `hotel_booking.db` será criado automaticamente na pasta raiz do projeto.
+
+---
+
+### Método 2: Compilando e Executando Manualmente (Avançado)
+
+1.  **Baixe o driver JDBC:**
+    -   Faça o download do arquivo `.jar` mais recente do [sqlite-jdbc no GitHub](https://github.com/xerial/sqlite-jdbc/releases).
+2.  **Organize os arquivos:**
+    -   Crie uma pasta `lib` na raiz do projeto.
+    -   Mova o arquivo `sqlite-jdbc-X.X.X.jar` que você baixou para dentro da pasta `lib`.
+3.  **Compile o projeto:**
+    -   Abra seu terminal e navegue até a pasta `src`.
+    -   Execute o comando de compilação, incluindo os `resources` e o driver `lib` no classpath:
+
+    ```bash
+    # (No Windows - observe o separador ';')
+    javac -cp ".;../lib/sqlite-jdbc-X.X.X.jar;../resources" -d ../out app/Main.java
+
+    # (No macOS/Linux - observe o separador ':')
+    javac -cp ".:../lib/sqlite-jdbc-X.X.X.jar:../resources" -d ../out app/Main.java
+    ```
+    *(Substitua `X.X.X` pela versão do jar que você baixou)*
+
+4.  **Execute o projeto:**
+    -   No terminal, navegue para a pasta `out` recém-criada.
+    -   Execute o `Main`, incluindo novamente o `lib` e `resources` no classpath:
+
+    ```bash
+    # (No Windows - observe o separador ';')
+    java -cp ".;../lib/sqlite-jdbc-X.X.X.jar;../resources" app.Main
+
+    # (No macOS/Linux - observe o separador ':')
+    java -cp ".:../lib/sqlite-jdbc-X.X.X.jar:../resources" app.Main
+    ```
+5.  Na primeira execução, o banco de dados `hotel_booking.db` será criado automaticamente.
