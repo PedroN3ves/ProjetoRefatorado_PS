@@ -3,8 +3,7 @@ package model;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Hotel
-{
+public class Hotel implements IEntidadeHoteleira {
     private final String name;
     private final String address;
 
@@ -184,5 +183,17 @@ public class Hotel
                 "Hotel: %s\nEndereço: %s\nDescrição: %s",
                 name, address, description
         );
+    }
+
+    @Override
+    public String getNome()
+    {
+        return this.getName();
+    }
+
+    @Override
+    public void exibirDetalhes()
+    {
+        System.out.println(this.toString());
     }
 }
