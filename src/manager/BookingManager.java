@@ -9,17 +9,20 @@ import strategy.CorporatePoinstsStrategy;
 import strategy.LoyaltyPointsStrategy;
 import strategy.PromoPointsStrategy;
 import strategy.StandardPointsStrategy;
+import util.DatabaseManager;
 import util.LanguageManager;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.MessageFormat;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 
 public class BookingManager
 {
-    private final List<Reservation> bookings = new ArrayList<>();
     private final Scanner scanner;
     private final CustomerManager customerManager;
     private final RoomManager roomManager;
@@ -27,13 +30,14 @@ public class BookingManager
     private int days;
     private double amount;
     private final List<ReservationObserver> observers = new ArrayList<>();
-
+    private final Connection conn;
     public BookingManager(Scanner scanner, CustomerManager customerManager, RoomManager roomManager, HotelManager hotelManager)
     {
         this.scanner = scanner;
         this.customerManager = customerManager;
         this.roomManager = roomManager;
         this.hotelManager = hotelManager;
+        this.conn = DatabaseManager.getInstance().getConnection();
     }
 
     private ReservationFactory getTypeReservation(int type)
@@ -72,14 +76,16 @@ public class BookingManager
 
     private void notifyReservationCreated(Reservation reservation)
     {
-        for (ReservationObserver observer : observers) {
+        for (ReservationObserver observer : observers)
+        {
             observer.onReservationCreated(reservation);
         }
     }
 
     private void notifyReservationCancelled(Reservation reservation)
     {
-        for (ReservationObserver observer : observers) {
+        for (ReservationObserver observer : observers)
+        {
             observer.onReservationCancelled(reservation);
         }
     }
@@ -118,7 +124,8 @@ public class BookingManager
 
         Reservation reservation = createReservationFactory(typeChoice, customer, hotel, room, days);
 
-        LoyaltyPointsStrategy strategy = switch (typeChoice) {
+        LoyaltyPointsStrategy strategy = switch (typeChoice)
+        {
             case 1 ->
                     new StandardPointsStrategy();
             case 2 ->
@@ -141,7 +148,8 @@ public class BookingManager
         try
         {
             paymentChoice = Integer.parseInt(scanner.nextLine());
-        } catch (NumberFormatException e)
+        }
+        catch (NumberFormatException e)
         {
             paymentChoice = -1;
         }
@@ -153,11 +161,11 @@ public class BookingManager
         {
             System.out.println(LanguageManager.INSTANCE.getMessage("payment.invalid"));
             paid = false;
-        } else
+        }
+        else
         {
             paid = gateway.processPayment(customer.getName(), amount);
         }
-
 
         if (!paid)
         {
@@ -165,10 +173,32 @@ public class BookingManager
             return;
         }
 
-        room.book();
+        String sqlInsertReservation = "INSERT INTO reservations (customerEmail, hotelName, roomNumber, days, totalCost) VALUES (?, ?, ?, ?, ?)";
+        String sqlUpdateRoom = "UPDATE rooms SET status = 'occupied' WHERE LOWER(hotelName) = LOWER(?) AND number = ?";
 
-        bookings.add(reservation);
+        try (PreparedStatement pstmtInsert = conn.prepareStatement(sqlInsertReservation);
+             PreparedStatement pstmtUpdate = conn.prepareStatement(sqlUpdateRoom)) {
 
+            pstmtInsert.setString(1, customer.getEmail());
+            pstmtInsert.setString(2, hotel.getName());
+            pstmtInsert.setString(3, room.getNumber());
+            pstmtInsert.setInt(4, days);
+            pstmtInsert.setDouble(5, amount);
+            pstmtInsert.executeUpdate();
+
+            pstmtUpdate.setString(1, hotel.getName());
+            pstmtUpdate.setString(2, room.getNumber());
+            pstmtUpdate.executeUpdate();
+        }
+        catch (SQLException e)
+        {
+            System.err.println(MessageFormat.format(
+                    LanguageManager.INSTANCE.getMessage("error.booking_create"),
+                    e.getMessage()
+            ));
+            room.makeAvailable();
+            return;
+        }
         customerManager.setPointsStrategy(strategy);
         customerManager.addReservationPoints(reservation);
 
@@ -183,24 +213,72 @@ public class BookingManager
         System.out.println(LanguageManager.INSTANCE.getMessage("booking.cancel_room"));
         String roomNumber = scanner.nextLine();
 
-        Iterator<Reservation> iterator = bookings.iterator();
-        while (iterator.hasNext())
+        Room room = roomManager.getRoom(hotelName, roomNumber);
+        if (room == null || room.isAvailable())
         {
-            Reservation r = iterator.next();
-            if (r.getHotel().getName().equalsIgnoreCase(hotelName) && r.getRoom().getNumber().equals(roomNumber))
-            {
-                Room room = roomManager.getRoom(hotelName, roomNumber);
-                if (room != null)
-                {
-                    room.makeAvailable();
-                }
-                iterator.remove();
+            System.out.println(LanguageManager.INSTANCE.getMessage("booking.not_found"));
+            return;
+        }
 
-                notifyReservationCancelled(r);
-                System.out.println(LanguageManager.INSTANCE.getMessage("booking.cancelled"));
-                return;
+        String sqlSelect = "SELECT customerEmail, days FROM reservations WHERE LOWER(hotelName) = LOWER(?) AND roomNumber = ?";
+        String customerEmail = null;
+        int reservationDays = 0;
+
+        try (PreparedStatement pstmtSelect = conn.prepareStatement(sqlSelect)) {
+            pstmtSelect.setString(1, hotelName);
+            pstmtSelect.setString(2, roomNumber);
+
+            try (ResultSet rs = pstmtSelect.executeQuery()) {
+                if (rs.next()) {
+                    customerEmail = rs.getString("customerEmail");
+                    reservationDays = rs.getInt("days");
+                }
+                else
+                {
+                    System.out.println(LanguageManager.INSTANCE.getMessage("booking.not_found"));
+                    return;
+                }
             }
         }
-        System.out.println(LanguageManager.INSTANCE.getMessage("booking.not_found"));
+        catch (SQLException e)
+        {
+            System.err.println(MessageFormat.format(
+                    LanguageManager.INSTANCE.getMessage("error.booking_get"),
+                    e.getMessage()
+            ));
+            return;
+        }
+
+        String sqlDelete = "DELETE FROM reservations WHERE LOWER(hotelName) = LOWER(?) AND roomNumber = ?";
+        String sqlUpdate = "UPDATE rooms SET status = 'available' WHERE LOWER(hotelName) = LOWER(?) AND number = ?";
+
+        try (PreparedStatement pstmtDelete = conn.prepareStatement(sqlDelete);
+             PreparedStatement pstmtUpdate = conn.prepareStatement(sqlUpdate))
+        {
+            pstmtDelete.setString(1, hotelName);
+            pstmtDelete.setString(2, roomNumber);
+            pstmtDelete.executeUpdate();
+
+            pstmtUpdate.setString(1, hotelName);
+            pstmtUpdate.setString(2, roomNumber);
+            pstmtUpdate.executeUpdate();
+
+        }
+        catch (SQLException e)
+        {
+            System.err.println(MessageFormat.format(
+                    LanguageManager.INSTANCE.getMessage("error.booking_delete"),
+                    e.getMessage()
+            ));
+            return;
+        }
+
+        Customer customer = customerManager.getCustomerByEmail(customerEmail);
+        Hotel hotel = hotelManager.getHotelByName(hotelName);
+
+        Reservation cancelledReservation = new StandardReservation(customer, hotel, room, reservationDays);
+
+        notifyReservationCancelled(cancelledReservation);
+        System.out.println(LanguageManager.INSTANCE.getMessage("booking.cancelled"));
     }
 }

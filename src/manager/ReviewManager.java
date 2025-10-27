@@ -1,20 +1,25 @@
 package manager;
 
 import model.Review;
+import util.DatabaseManager;
 import util.LanguageManager;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.MessageFormat;
 import java.util.Scanner;
 
 public class ReviewManager
 {
-    private List<Review> reviews = new ArrayList<>();
-    private Scanner scanner;
+    private final Scanner scanner;
+    private final Connection conn;
 
     public ReviewManager(Scanner scanner)
     {
         this.scanner = scanner;
+        this.conn = DatabaseManager.getInstance().getConnection();
     }
 
     public void addReview()
@@ -28,8 +33,27 @@ public class ReviewManager
         System.out.println(LanguageManager.INSTANCE.getMessage("review.comment"));
         String comment = scanner.nextLine();
 
-        reviews.add(new Review(email, hotelName, rating, comment));
-        System.out.println(LanguageManager.INSTANCE.getMessage("review.added"));
+        String sql = "INSERT INTO reviews (customerEmail, hotelName, rating, comment) VALUES (?, ?, ?, ?)";
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql))
+        {
+            pstmt.setString(1, email);
+            pstmt.setString(2, hotelName);
+            pstmt.setInt(3, rating);
+            pstmt.setString(4, comment);
+
+            pstmt.executeUpdate();
+
+            System.out.println(LanguageManager.INSTANCE.getMessage("review.added"));
+
+        }
+        catch (SQLException e)
+        {
+            System.err.println(MessageFormat.format(
+                    LanguageManager.INSTANCE.getMessage("error.review_add"),
+                    e.getMessage()
+            ));
+        }
     }
 
     public void showReviews()
@@ -37,17 +61,40 @@ public class ReviewManager
         System.out.println(LanguageManager.INSTANCE.getMessage("review.show_reviews"));
         String hotelName = scanner.nextLine();
         boolean found = false;
-        for (Review r : reviews)
+
+        String sql = "SELECT customerEmail, hotelName, rating, comment FROM reviews WHERE LOWER(hotelName) = LOWER(?)";
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql))
         {
-            if (r.getHotelName().equalsIgnoreCase(hotelName))
+            pstmt.setString(1, hotelName);
+
+            try (ResultSet rs = pstmt.executeQuery())
             {
-                System.out.println(r);
-                found = true;
+                while (rs.next())
+                {
+                    if (!found) found = true;
+                    Review r = new Review(
+                            rs.getString("customerEmail"),
+                            rs.getString("hotelName"),
+                            rs.getInt("rating"),
+                            rs.getString("comment")
+                    );
+
+                    System.out.println(r);
+                }
+            }
+
+            if (!found)
+            {
+                System.out.println(LanguageManager.INSTANCE.getMessage("review.not_found"));
             }
         }
-        if (!found)
+        catch (SQLException e)
         {
-            System.out.println(LanguageManager.INSTANCE.getMessage("review.not_found"));
+            System.err.println(MessageFormat.format(
+                    LanguageManager.INSTANCE.getMessage("error.review_show"),
+                    e.getMessage()
+            ));
         }
     }
 }

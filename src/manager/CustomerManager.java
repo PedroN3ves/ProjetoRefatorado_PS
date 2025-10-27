@@ -3,22 +3,26 @@ package manager;
 import model.Customer;
 import model.Reservation;
 import strategy.LoyaltyPointsStrategy;
+import util.DatabaseManager;
 import util.LanguageManager;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 public class CustomerManager
 {
-    private List<Customer> customers = new ArrayList<>();
     private LoyaltyPointsStrategy pointsStrategy;
-    private Scanner scanner;
+    private final Scanner scanner;
+    private final Connection conn;
 
     public CustomerManager(Scanner scanner)
     {
         this.scanner = scanner;
+        this.conn = DatabaseManager.getInstance().getConnection();
     }
 
     public void createCustomer()
@@ -28,28 +32,60 @@ public class CustomerManager
         System.out.println(LanguageManager.INSTANCE.getMessage("customer.email"));
         String email = scanner.nextLine();
 
-        for (Customer c : customers)
+        String sql = "INSERT INTO customers (email, name) VALUES (?, ?)";
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql))
         {
-            if (c.getEmail().equalsIgnoreCase(email))
+            pstmt.setString(1, email);
+            pstmt.setString(2, name);
+
+            pstmt.executeUpdate();
+
+            System.out.println(LanguageManager.INSTANCE.getMessage("customer.created"));
+
+        }
+        catch (SQLException e)
+        {
+            if (e.getErrorCode() == 19 && e.getMessage().contains("UNIQUE constraint failed"))
             {
                 System.out.println(LanguageManager.INSTANCE.getMessage("customer.exists"));
-                return;
+            } else
+            {
+                System.err.println(MessageFormat.format(
+                        LanguageManager.INSTANCE.getMessage("error.customer_create"),
+                        e.getMessage()
+                ));
             }
         }
-
-        Customer newCustomer = new Customer(name, email);
-        customers.add(newCustomer);
-        System.out.println(LanguageManager.INSTANCE.getMessage("customer.created"));
     }
 
     public Customer getCustomerByEmail(String email)
     {
-        for (Customer c : customers)
+        String sql = "SELECT email, name, loyaltyPoints FROM customers WHERE LOWER(email) = LOWER(?)";
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql))
         {
-            if (c.getEmail().equalsIgnoreCase(email))
+            pstmt.setString(1, email);
+
+            try (ResultSet rs = pstmt.executeQuery())
             {
-                return c;
+                if (rs.next())
+                {
+                    Customer customer = new Customer(
+                            rs.getString("name"),
+                            rs.getString("email")
+                    );
+                    customer.addPoints(rs.getInt("loyaltyPoints"));
+                    return customer;
+                }
             }
+        }
+        catch (SQLException e)
+        {
+            System.err.println(MessageFormat.format(
+                    LanguageManager.INSTANCE.getMessage("error.customer_get"),
+                    e.getMessage()
+            ));
         }
         return null;
     }
@@ -71,10 +107,21 @@ public class CustomerManager
 
     public void addLoyaltyPoints(String email, int points)
     {
-        Customer customer = getCustomerByEmail(email);
-        if (customer != null)
+        String sql = "UPDATE customers SET loyaltyPoints = loyaltyPoints + ? WHERE LOWER(email) = LOWER(?)";
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql))
         {
-            customer.addPoints(points);
+            pstmt.setInt(1, points);
+            pstmt.setString(2, email);
+            pstmt.executeUpdate();
+
+        }
+        catch (SQLException e)
+        {
+            System.err.println(MessageFormat.format(
+                    LanguageManager.INSTANCE.getMessage("error.customer_add_points"),
+                    e.getMessage()
+            ));
         }
     }
 
@@ -94,9 +141,14 @@ public class CustomerManager
         String email = scanner.nextLine();
 
         Customer customer = getCustomerByEmail(email);
+
         if (customer != null)
         {
-            System.out.println(MessageFormat.format(LanguageManager.INSTANCE.getMessage("customer.loyalty_points.result"), email, customer.getLoyaltyPoints()));
+            System.out.println(MessageFormat.format(
+                    LanguageManager.INSTANCE.getMessage("customer.loyalty_points.result"),
+                    email,
+                    customer.getLoyaltyPoints()
+            ));
         }
         else
         {

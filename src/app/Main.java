@@ -2,6 +2,7 @@ package app;
 
 
 import facade.HotelSystemFacade;
+import util.DatabaseManager;
 import util.LanguageManager;
 
 import java.util.Scanner;
@@ -12,6 +13,7 @@ public class Main
     {
         Scanner scanner = new Scanner(System.in);
         LanguageManager.INSTANCE.initLanguage();
+        DatabaseManager.getInstance().createInitialTables();
         HotelSystemFacade facade = new HotelSystemFacade(scanner);
 
         while (true)

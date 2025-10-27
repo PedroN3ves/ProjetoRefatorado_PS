@@ -1,11 +1,14 @@
 package model;
 
+import util.LanguageManager;
+import java.text.MessageFormat;
+
 public class Review
 {
-    private String email;
-    private String hotelName;
-    private int rating;
-    private String comment;
+    private final String email;
+    private final String hotelName;
+    private final int rating;
+    private final String comment;
 
     public Review(String email, String hotelName, int rating, String comment)
     {
@@ -39,6 +42,11 @@ public class Review
     public String
     toString()
     {
-        return email + " rated " + rating + "/5: " + comment;
+        return MessageFormat.format(
+                LanguageManager.INSTANCE.getMessage("review.display_format"),
+                email,
+                rating,
+                comment
+        );
     }
 }
