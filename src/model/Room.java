@@ -1,6 +1,7 @@
 package model;
 
 import model.state.AvailableState;
+import model.state.OccupiedState;
 import model.state.RoomState;
 import util.LanguageManager;
 
@@ -43,11 +44,16 @@ public class Room
         this.state = state;
     }
 
+    public RoomState getState()
+    {
+        return state;
+    }
+
     public String getHotelName()
     {
         return hotelName;
     }
-
+    // ... (resto da classe) ...
     public String getNumber()
     {
         return number;
@@ -66,6 +72,11 @@ public class Room
     public boolean isAvailable()
     {
         return state.isAvailable();
+    }
+
+    public boolean isOccupied()
+    {
+        return state instanceof OccupiedState;
     }
 
     @Override
