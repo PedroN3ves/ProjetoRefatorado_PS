@@ -38,10 +38,37 @@ public class CustomerManager
         return pattern.matcher(email).matches();
     }
 
+
+    private boolean isValidName(String name)
+    {
+        if (name == null || name.trim().isEmpty())
+        {
+            return false;
+        }
+
+        String regex = ".*\\d.*";
+        Pattern pattern = Pattern.compile(regex);
+
+        return !pattern.matcher(name).matches();
+    }
+
     public void createCustomer()
     {
-        System.out.println(LanguageManager.INSTANCE.getMessage("customer.name"));
-        String name = scanner.nextLine();
+        String name;
+        while (true)
+        {
+            System.out.println(LanguageManager.INSTANCE.getMessage("customer.name"));
+            name = scanner.nextLine();
+
+            if (isValidName(name))
+            {
+                break;
+            }
+            else
+            {
+                System.out.println(LanguageManager.INSTANCE.getMessage("error.name_contains_number"));
+            }
+        }
 
         String email;
         while (true)

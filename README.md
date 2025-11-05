@@ -70,6 +70,31 @@ Não foi adicionada nenhuma nova funcionalidade, apenas refatoradas as existente
     - `AvailableState`, `OccupiedState`, `MaintenanceState`
 - Benefício: Evita condicionais complexas (if/else) na classe `Room` e facilita a adição de novos estados.
 
+## Tratamento de Exceções
+
+O sistema possui tratamento contra entradas inválidas do usuário, utilizando validações em tempo real para garantir que os dados inseridos estejam corretos antes de serem processados. Caso uma entrada seja inválida, o sistema informa o usuário e solicita a informação novamente.
+
+* **Seleção de Idioma:**
+    * Valida se a opção de idioma (1, 2 ou 3) é válida. Caso não seja, reverte automaticamente para o Inglês como padrão.
+
+* **Menu Principal:**
+    * Valida se a opção do menu (1-14) é válida. Opções fora desse intervalo resultam em uma mensagem de "Opção inválida".
+
+* **Gestão de Clientes (`CustomerManager`):**
+    * **Nome:** Verifica se o nome do cliente não contém números.
+    * **Email:** Utiliza Regex para validar se o formato do email é válido (ex: `usuario@dominio.com`).
+
+* **Gestão de Quartos (`RoomManager`):**
+    * **Tipo de Quarto:** Valida se o tipo de quarto inserido (ex: "solteiro", "casal") corresponde a um tipo válido definido no sistema.
+
+* **Gestão de Reservas (`BookingManager`):**
+    * **Dias:** Valida se a quantidade de dias da reserva é um número (`NumberFormatException`) e se é um valor positivo (maior que 0).
+    * **Tipo de Reserva:** Valida se a opção (1-Standard, 2-Promo, 3-Corporate) é um número e se está dentro do intervalo permitido (1, 2 ou 3).
+    * **Pagamento:** Valida se a opção de pagamento é um número válido.
+
+* **Gestão de Avaliações (`ReviewManager`):**
+    * **Rating (Nota):** Valida se a nota fornecida é um número (`NumberFormatException`) e se está dentro do intervalo permitido (1 a 5).
+
 ## Funcionalidades Principais
 
 ### Gestão de Hotéis
