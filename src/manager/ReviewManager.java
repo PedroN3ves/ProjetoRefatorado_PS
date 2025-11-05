@@ -23,11 +23,6 @@ public class ReviewManager
         this.conn = DatabaseManager.getInstance().getConnection();
     }
 
-    /**
-     * Valida se uma string corresponde a um formato de email padrão.
-     * @param email A string a ser validada.
-     * @return true se o formato for válido, false caso contrário.
-     */
     private boolean isValidEmail(String email)
     {
         if (email == null || email.isEmpty())
@@ -54,7 +49,6 @@ public class ReviewManager
             }
             else
             {
-                // TODO: Adicionar esta mensagem aos arquivos .properties
                 System.out.println(LanguageManager.INSTANCE.getMessage("error.email"));
             }
         }
