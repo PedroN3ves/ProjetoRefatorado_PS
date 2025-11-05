@@ -10,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 public class ReviewManager
 {
@@ -22,10 +23,42 @@ public class ReviewManager
         this.conn = DatabaseManager.getInstance().getConnection();
     }
 
+    /**
+     * Valida se uma string corresponde a um formato de email padrão.
+     * @param email A string a ser validada.
+     * @return true se o formato for válido, false caso contrário.
+     */
+    private boolean isValidEmail(String email)
+    {
+        if (email == null || email.isEmpty())
+        {
+            return false;
+        }
+        String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$";
+
+        Pattern pattern = Pattern.compile(emailRegex);
+        return pattern.matcher(email).matches();
+    }
+
     public void addReview()
     {
-        System.out.println(LanguageManager.INSTANCE.getMessage("review.customer_email"));
-        String email = scanner.nextLine();
+        String email;
+        while (true)
+        {
+            System.out.println(LanguageManager.INSTANCE.getMessage("review.customer_email"));
+            email = scanner.nextLine();
+
+            if (isValidEmail(email))
+            {
+                break;
+            }
+            else
+            {
+                // TODO: Adicionar esta mensagem aos arquivos .properties
+                System.out.println(LanguageManager.INSTANCE.getMessage("error.email"));
+            }
+        }
+
         System.out.println(LanguageManager.INSTANCE.getMessage("review.hotel_name"));
         String hotelName = scanner.nextLine();
         System.out.println(LanguageManager.INSTANCE.getMessage("review.rating"));

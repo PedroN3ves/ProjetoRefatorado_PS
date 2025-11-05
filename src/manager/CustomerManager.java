@@ -12,6 +12,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 public class CustomerManager
 {
@@ -25,12 +26,38 @@ public class CustomerManager
         this.conn = DatabaseManager.getInstance().getConnection();
     }
 
+    private boolean isValidEmail(String email)
+    {
+        if (email == null || email.isEmpty())
+        {
+            return false;
+        }
+        String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$";
+
+        Pattern pattern = Pattern.compile(emailRegex);
+        return pattern.matcher(email).matches();
+    }
+
     public void createCustomer()
     {
         System.out.println(LanguageManager.INSTANCE.getMessage("customer.name"));
         String name = scanner.nextLine();
-        System.out.println(LanguageManager.INSTANCE.getMessage("customer.email"));
-        String email = scanner.nextLine();
+
+        String email;
+        while (true)
+        {
+            System.out.println(LanguageManager.INSTANCE.getMessage("customer.email"));
+            email = scanner.nextLine();
+
+            if (isValidEmail(email))
+            {
+                break;
+            }
+            else
+            {
+                System.out.println(LanguageManager.INSTANCE.getMessage("error.email"));
+            }
+        }
 
         String sql = "INSERT INTO customers (email, name) VALUES (?, ?)";
 
@@ -137,8 +164,21 @@ public class CustomerManager
 
     public void showLoyaltyPoints()
     {
-        System.out.println(LanguageManager.INSTANCE.getMessage("customer.loyalty_points.show"));
-        String email = scanner.nextLine();
+        String email;
+        while (true)
+        {
+            System.out.println(LanguageManager.INSTANCE.getMessage("customer.loyalty_points.show"));
+            email = scanner.nextLine();
+
+            if (isValidEmail(email))
+            {
+                break;
+            }
+            else
+            {
+                System.out.println(LanguageManager.INSTANCE.getMessage("error.email"));
+            }
+        }
 
         Customer customer = getCustomerByEmail(email);
 

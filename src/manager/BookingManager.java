@@ -20,6 +20,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 public class BookingManager
 {
@@ -38,6 +39,23 @@ public class BookingManager
         this.roomManager = roomManager;
         this.hotelManager = hotelManager;
         this.conn = DatabaseManager.getInstance().getConnection();
+    }
+
+    /**
+     * Valida se uma string corresponde a um formato de email padrão.
+     * @param email A string a ser validada.
+     * @return true se o formato for válido, false caso contrário.
+     */
+    private boolean isValidEmail(String email)
+    {
+        if (email == null || email.isEmpty())
+        {
+            return false;
+        }
+        String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$";
+
+        Pattern pattern = Pattern.compile(emailRegex);
+        return pattern.matcher(email).matches();
     }
 
     private ReservationFactory getTypeReservation(int type)
@@ -92,8 +110,22 @@ public class BookingManager
 
     public void bookRoom()
     {
-        System.out.println(LanguageManager.INSTANCE.getMessage("booking.customer_email"));
-        String email = scanner.nextLine();
+        String email;
+        while (true)
+        {
+            System.out.println(LanguageManager.INSTANCE.getMessage("booking.customer_email"));
+            email = scanner.nextLine();
+
+            if (isValidEmail(email))
+            {
+                break;
+            }
+            else
+            {
+                System.out.println(LanguageManager.INSTANCE.getMessage("error.email"));
+            }
+        }
+
         Customer customer = customerManager.getCustomerByEmail(email);
         if (customer == null)
         {
