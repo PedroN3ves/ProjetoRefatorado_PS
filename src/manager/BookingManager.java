@@ -41,11 +41,6 @@ public class BookingManager
         this.conn = DatabaseManager.getInstance().getConnection();
     }
 
-    /**
-     * Valida se uma string corresponde a um formato de email padrão.
-     * @param email A string a ser validada.
-     * @return true se o formato for válido, false caso contrário.
-     */
     private boolean isValidEmail(String email)
     {
         if (email == null || email.isEmpty())
@@ -137,10 +132,28 @@ public class BookingManager
         String hotelName = scanner.nextLine();
         System.out.println(LanguageManager.INSTANCE.getMessage("booking.room_number"));
         String roomNumber = scanner.nextLine();
-        System.out.println(LanguageManager.INSTANCE.getMessage("booking.days"));
-        String daysString = scanner.nextLine();
 
-        days = Integer.parseInt(daysString);
+        while (true)
+        {
+            System.out.println(LanguageManager.INSTANCE.getMessage("booking.days"));
+            String daysString = scanner.nextLine();
+            try
+            {
+                days = Integer.parseInt(daysString);
+                if (days > 0)
+                {
+                    break;
+                }
+                else
+                {
+                    System.out.println(LanguageManager.INSTANCE.getMessage("error.days"));
+                }
+            }
+            catch (NumberFormatException e)
+            {
+                System.out.println(LanguageManager.INSTANCE.getMessage("error.int"));
+            }
+        }
 
         Room room = roomManager.getAvailableRoom(hotelName, roomNumber);
         if (room == null)
@@ -151,8 +164,28 @@ public class BookingManager
 
         Hotel hotel = hotelManager.getHotelByName(room.getHotelName());
 
-        System.out.println(LanguageManager.INSTANCE.getMessage("booking.type"));
-        int typeChoice = Integer.parseInt(scanner.nextLine());
+        int typeChoice;
+        while (true)
+        {
+            System.out.println(LanguageManager.INSTANCE.getMessage("booking.type"));
+            String typeString = scanner.nextLine();
+            try
+            {
+                typeChoice = Integer.parseInt(typeString);
+                if (typeChoice >= 1 && typeChoice <= 3)
+                {
+                    break;
+                }
+                else
+                {
+                    System.out.println(LanguageManager.INSTANCE.getMessage("error.choice"));
+                }
+            }
+            catch (NumberFormatException e)
+            {
+                System.out.println(LanguageManager.INSTANCE.getMessage("error.choice"));
+            }
+        }
 
         Reservation reservation = createReservationFactory(typeChoice, customer, hotel, room, days);
 
@@ -225,7 +258,7 @@ public class BookingManager
         catch (SQLException e)
         {
             System.err.println(MessageFormat.format(
-                    LanguageManager.INSTANCE.getMessage("error.booking_create"),
+                    LanguageManager.INSTANCE.getMessage("error.booking.create"),
                     e.getMessage()
             ));
             room.makeAvailable();
@@ -275,7 +308,7 @@ public class BookingManager
         catch (SQLException e)
         {
             System.err.println(MessageFormat.format(
-                    LanguageManager.INSTANCE.getMessage("error.booking_get"),
+                    LanguageManager.INSTANCE.getMessage("error.booking.get"),
                     e.getMessage()
             ));
             return;
@@ -299,7 +332,7 @@ public class BookingManager
         catch (SQLException e)
         {
             System.err.println(MessageFormat.format(
-                    LanguageManager.INSTANCE.getMessage("error.booking_delete"),
+                    LanguageManager.INSTANCE.getMessage("error.booking.delete"),
                     e.getMessage()
             ));
             return;
