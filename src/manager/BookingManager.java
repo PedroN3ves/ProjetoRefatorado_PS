@@ -183,7 +183,7 @@ public class BookingManager
             }
             catch (NumberFormatException e)
             {
-                System.out.println(LanguageManager.INSTANCE.getMessage("error.choice"));
+                System.out.println(LanguageManager.INSTANCE.getMessage("error.number"));
             }
         }
 

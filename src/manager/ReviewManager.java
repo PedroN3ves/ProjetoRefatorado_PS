@@ -55,8 +55,31 @@ public class ReviewManager
 
         System.out.println(LanguageManager.INSTANCE.getMessage("review.hotel_name"));
         String hotelName = scanner.nextLine();
-        System.out.println(LanguageManager.INSTANCE.getMessage("review.rating"));
-        int rating = Integer.parseInt(scanner.nextLine());
+
+        int rating;
+        while(true)
+        {
+            System.out.println(LanguageManager.INSTANCE.getMessage("review.rating"));
+            String ratingString = scanner.nextLine();
+            try
+            {
+                rating = Integer.parseInt(ratingString);
+                if (rating >= 1 && rating <= 5)
+                {
+                    break;
+                }
+                else
+                {
+                    System.out.println(LanguageManager.INSTANCE.getMessage("error.rating"));
+                }
+            }
+            catch (NumberFormatException e)
+            {
+                System.out.println(LanguageManager.INSTANCE.getMessage("error.rating2"));
+            }
+        }
+
+
         System.out.println(LanguageManager.INSTANCE.getMessage("review.comment"));
         String comment = scanner.nextLine();
 
