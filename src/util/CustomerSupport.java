@@ -17,8 +17,17 @@ public class CustomerSupport {
         System.out.println(LanguageManager.INSTANCE.getMessage("support.option5"));
         System.out.print(LanguageManager.INSTANCE.getMessage("support.choice") + " ");
 
-        int choice = scanner.nextInt();
-        scanner.nextLine();
+        int choice;
+        try
+        {
+            String input = scanner.nextLine();
+
+            choice = Integer.parseInt(input);
+        }
+        catch (NumberFormatException e)
+        {
+            choice = -1;
+        }
 
         switch (choice) {
             case 1:
